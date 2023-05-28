@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 THIS_DIR=$(readlink -f "$(dirname "$0")")
+BUILD_DIR="${THIS_DIR}/.."
 BUILDER=pkg-builder-ubuntu-22.04
 
 check_docker_cmd() {
@@ -25,8 +26,8 @@ build_docker_image() {
 run_in_docker() {
     docker run \
         -e http_proxy -e https_proxy -e no_proxy \
-        -v "${THIS_DIR}":/root/build \
-        -it --entrypoint "/root/build/$1" \
+        -v "${BUILD_DIR}":/root/build \
+        -i --entrypoint "/root/build/ubuntu-22.04/$1" \
         "${BUILDER}"
 }
 
