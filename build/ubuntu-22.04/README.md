@@ -13,10 +13,12 @@ Consider removing it to resolve `no dependency information found for /usr/local/
 ## Build all
 
 build-repo.sh will build host packages into host_repo/ and guest packages into guest_repo/ .
+Running build-repo.sh depends on your host setup. It's recommended to build in docker using `pkg-builder`.
 
 ```
 cd tdx-tools/build/ubuntu-22.04
-./build-repo.sh
+
+./pkg-builer build-repo.sh
 ```
 
 If you need to build some packages separately, go into each subdirectory and run `build.sh`.
