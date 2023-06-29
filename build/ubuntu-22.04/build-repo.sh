@@ -31,7 +31,7 @@ build_grub () {
     sudo apt remove libzfslinux-dev -y || true
     [[ -f $STATUS_DIR/grub.done ]] || ./build.sh 2>&1 | tee "$LOG_DIR"/grub2.log
     touch "$STATUS_DIR"/grub.done
-    cp grub-efi-amd64_*_amd64.deb grub-efi-amd64-bin_*_amd64.deb ../$GUEST_REPO/
+    cp grub-efi-*_amd64.deb  ../$GUEST_REPO/
     popd
 
     # Uninstall to avoid confilcts with libnvpair-dev
@@ -42,8 +42,8 @@ build_kernel () {
     pushd intel-mvp-tdx-kernel
     [[ -f $STATUS_DIR/kernel.done ]] || ./build.sh 2>&1 | tee "$LOG_DIR"/kernel.log
     touch "$STATUS_DIR"/kernel.done
-    cp linux-image-unsigned-6.2.0-*.deb linux-headers-6.2.0-* linux-modules-6.2.0-* ../$GUEST_REPO/
-    cp linux-image-unsigned-6.2.0-*.deb linux-headers-6.2.0-* linux-modules-6.2.0-* linux-modules-extra-6.2.0-* ../$HOST_REPO/
+    cp linux-*6.2.0*.deb ../$GUEST_REPO/
+    cp linux-*6.2.0*.deb ../$HOST_REPO/
     popd
 }
 
@@ -51,7 +51,7 @@ build_qemu () {
     pushd intel-mvp-tdx-qemu-kvm
     [[ -f $STATUS_DIR/qemu.done ]] || ./build.sh 2>&1 | tee "$LOG_DIR"/qemu.log
     touch "$STATUS_DIR"/qemu.done
-    cp qemu-system-x86_7.2*.deb qemu-system-common_7.2*.deb qemu-system-data_7.2*.deb ../$HOST_REPO/
+    cp qemu*_amb64.deb ../$HOST_REPO/
     popd
 }
 
@@ -67,9 +67,7 @@ build_libvirt () {
     pushd intel-mvp-tdx-libvirt
     [[ -f $STATUS_DIR/libvirt.done ]] || ./build.sh 2>&1 | tee "$LOG_DIR"/libvirt.log
     touch "$STATUS_DIR"/libvirt.done
-    cp libvirt-clients_*.deb libvirt0_*.deb libvirt-daemon_*.deb libvirt-daemon-system_*.deb libvirt-daemon-system-systemd_*.deb \
-            libvirt-daemon-driver-qemu_*.deb libvirt-daemon-config-network_*.deb libvirt-daemon-config-nwfilter_*.deb \
-            libvirt-login-shell_*.deb libvirt-daemon-driver-lxc_*.deb ../$HOST_REPO/
+    cp libvirt*_amb64.deb libnss*_amd64.deb ../$HOST_REPO/
     popd
 }
 
@@ -87,6 +85,14 @@ build_kernel
 build_qemu
 build_tdvf
 build_libvirt
+
+# Generate repository
+if ! command -v "createrepo"
+then
+    sudo apt install dpkg-dev -y
+fi
+dpkg-scanpackages $HOST_REPO > $HOST_REPO/Packages
+dpkg-scanpackages $GUEST_REPO > $GUEST_REPO/Packages
 
 # All build pass, remove build status directory
 rm -rf "${STATUS_DIR:?}"/
