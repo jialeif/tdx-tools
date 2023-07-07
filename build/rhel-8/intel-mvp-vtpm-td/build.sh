@@ -15,12 +15,15 @@ get_source() {
     cd "${CURR_DIR}"
     if [[ ! -d ${PKG_DIR} ]]; then
         git clone --single-branch --branch ${GIT_TAG} ${GIT_URI} ${PKG_DIR}
+    fi
+    if [[ ! -f ${PKG_DIR}/sync.done ]]; then
         pushd "${PKG_DIR}"
         git submodule update --init --recursive
+        touch sync.done
         popd
     fi
 
-    tar czf "${RPMBUILD_DIR}"/SOURCES/vtpm-td.tar.gz ${PKG_DIR}
+    tar --exclude=.git -czf "${RPMBUILD_DIR}"/SOURCES/vtpm-td.tar.gz ${PKG_DIR}
 }
 
 prepare() {
