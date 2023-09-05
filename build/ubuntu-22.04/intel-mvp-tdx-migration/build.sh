@@ -6,6 +6,7 @@ CURR_DIR=$(dirname "$(readlink -f "$0")")
 GIT_URI="https://github.com/intel/MigTD.git"
 GIT_TAG="v0.2.3"
 PKG_DIR="${CURR_DIR}"/migtd
+PATCH="${CURR_DIR}"/../../common/td-shim.diff
 
 get_source() {
     echo "Get upstream source code..."
@@ -46,6 +47,12 @@ build() {
     echo "Build..."
     cd "${PKG_DIR}"
     ./sh_script/preparation.sh
+
+    # hotfix for td-shim-tools build error.
+    pushd deps/td-shim
+    patch -p 1 -i $PATCH
+    popd
+
     cargo image
     cargo hash --image target/release/migtd.bin > ./migtd.servtd_info_hash
     dpkg-source --before-build .

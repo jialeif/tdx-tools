@@ -51,6 +51,12 @@ source "$HOME/.cargo/env"
 cargo install cargo-xbuild
 rustup component add rust-src
 ./sh_script/preparation.sh
+
+# hotfix for td-shim-tools build error.
+pushd deps/td-shim
+patch -p 1 -i ../../td-shim.diff
+popd
+
 cargo image
 cargo hash --image target/release/migtd.bin > ./migtd.servtd_info_hash
 

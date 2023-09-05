@@ -8,6 +8,7 @@ SPEC_FILE="${CURR_DIR}/tdx-migration.spec"
 GIT_URI="https://github.com/intel/MigTD.git"
 GIT_TAG="v0.2.3"
 PKG_DIR="${CURR_DIR}"/migtd
+PATCH="${CURR_DIR}"/../../common/td-shim.diff
 
 get_source() {
     echo "Get upstream source code..."
@@ -20,6 +21,7 @@ get_source() {
         popd
     fi
 
+    cp "${PATCH}" "${PKG_DIR}/"
     tar czf "${RPMBUILD_DIR}"/SOURCES/tdx-migration.tar.gz migtd
 }
 
