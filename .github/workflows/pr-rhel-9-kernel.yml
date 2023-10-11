@@ -1,0 +1,26 @@
+name: Validate PR for RHEL9 kernel
+
+on:
+  pull_request:
+    paths:
+    - 'build/rhel-9/intel-mvp-tdx-kernel/**'
+  workflow_dispatch:
+
+jobs:
+  build_package:
+    name: Build kernel for RHEL9
+    runs-on: [self-hosted]
+    container:
+      image: gar-registry.caas.intel.com/cpio/devops-base:rhel9-2023WW31
+    steps:
+      - name: Cleanup workspace for the job (self hosted only)
+        run: |
+          sudo rm -fr * .* || true
+      - id: checkout_self
+        name: Check out PR
+        uses: actions/checkout@v3
+      - id: build
+        name: Build the source and binary packages
+        run: |
+          cd build/rhel-9/intel-mvp-tdx-kernel/
+          ./build.sh
